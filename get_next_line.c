@@ -6,7 +6,7 @@
 /*   By: atenhune <atenhune@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/29 13:10:39 by antti             #+#    #+#             */
-/*   Updated: 2021/12/14 15:59:08 by atenhune         ###   ########.fr       */
+/*   Updated: 2021/12/14 19:18:01 by atenhune         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ char	*strjoin(const char *s1, const char *s2)
 		j++;
 	}
 	ret[i] = '\0';
+	
 	free((void *)s1);
 	return (ret);
 }
@@ -91,22 +92,23 @@ int	toomanylines(char **save, int *read_ret, int fd)
 
 int	get_next_line(const int fd, char **line)
 {
-	static char	*save[12288];
+	static char	*save[4096];
 	int			read_ret;
 	int			newline_index;
 
 	read_ret = BUFF_SIZE;
-	if (!line || fd > 12288 || fd < 0 || BUFF_SIZE <= 0)
+	if (!line || fd > 4096 || fd < 0 || BUFF_SIZE <= 0)
 		return (-1);
 	if (toomanylines(&save[fd], &read_ret, fd) == -1)
 		return (-1);
 	newline_index = newline(save[fd]);
-	*line = ft_strsub(save[fd], 0, newline_index);
+	if (save[fd][0] != '\0')
+		*line = ft_strsub(save[fd], 0, newline_index);
 	if (is_there_end(save[fd]))
 		save[fd] = ft_strcpy(&save[fd][0], &save[fd][newline_index + 1]);
 	if (read_ret == 0 && save[fd][0] == '\0')
 	{
-		free(save[fd]);
+		// free(save[fd]);
 		return (0);
 	}
 	if (read_ret == 0 && !is_there_end(save[fd]))
